@@ -32,6 +32,7 @@ const StyledTable = chakra(Table, {
 const TableCategory = () => {
   const dispatch = useDispatch();
   const categories = useSelector((state) => state?.category);
+  const isAuthenticated = localStorage.getItem("token");
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -63,14 +64,16 @@ const TableCategory = () => {
 
   return (
     <>
-      <Button
-        onClick={handleCreateModalOpen}
-        colorScheme="teal"
-        mt={4}
-        right={0}
-      >
-        Create New Category
-      </Button>
+      {isAuthenticated && (
+        <Button
+          onClick={handleCreateModalOpen}
+          colorScheme="teal"
+          mt={4}
+          right={0}
+        >
+          Create New Category
+        </Button>
+      )}
       <StyledTable>
         <TableCaption>Categories</TableCaption>
         <Thead>
@@ -105,17 +108,21 @@ const TableCategory = () => {
                   : "Invalid Date"}
               </Td>
               <Td borderWidth="1px">
-                <IconButton
-                  icon={<EditIcon />}
-                  colorScheme="blue"
-                  mr={2}
-                  onClick={() => handleEdit(category)}
-                />
-                <IconButton
-                  icon={<DeleteIcon />}
-                  colorScheme="red"
-                  onClick={() => handleDelete(category.id)}
-                />
+                {isAuthenticated && (
+                  <>
+                    <IconButton
+                      icon={<EditIcon />}
+                      colorScheme="blue"
+                      mr={2}
+                      onClick={() => handleEdit(category)}
+                    />
+                    <IconButton
+                      icon={<DeleteIcon />}
+                      colorScheme="red"
+                      onClick={() => handleDelete(category.id)}
+                    />
+                  </>
+                )}
               </Td>
             </Tr>
           ))}
