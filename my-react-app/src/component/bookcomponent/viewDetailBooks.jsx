@@ -19,10 +19,10 @@ import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutli
 import { useDispatch } from "react-redux";
 import { asyncDeleteBooks, asyncEditBooks } from "../../redux/books/action";
 
-const ViewDetailBooks = ({ isOpen, onClose, product, isAuthenticated }) => {
+const ViewDetailBooks = ({ isOpen, onClose, product }) => {
   const dispatch = useDispatch();
   const toast = useToast();
-
+  const isAuthenticated = localStorage.getItem("token");
   const [editedBook, setEditedBook] = useState({
     title: product.title,
     description: product.description,
