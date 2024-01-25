@@ -28,7 +28,17 @@ function asyncGetAllUser() {
       const { data } = await api.get('/users');
 
       dispatch(receiveUsersActionCreator(data.data));
-      console.log('tes', data);
+    } catch (error) {
+      console.log(error?.response?.data?.message || error?.message);
+    }
+  };
+}
+function asyncGetUserById(id) {
+  return async (dispatch) => {
+    try {
+      const { data } = await api.get(`/users/${id}`);
+
+      dispatch(receiveUsersActionCreator(data.data));
     } catch (error) {
       console.log(error?.response?.data?.message || error?.message);
     }
@@ -57,4 +67,4 @@ function asyncDeleteUser(id) {
   };
 }
 
-export { ActionType, asyncGetAllUser, asyncEditUser, asyncDeleteUser };
+export { ActionType, asyncGetAllUser, asyncEditUser, asyncDeleteUser,asyncGetUserById };

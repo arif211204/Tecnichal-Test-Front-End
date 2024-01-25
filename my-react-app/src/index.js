@@ -10,14 +10,16 @@ import '@fontsource/roboto/700.css';
 import './index.css'
 import store from "./redux";
 import App from "./App";
+import { AuthProvider } from "./AuthProvider";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <Provider store={store}>
-    <ChakraProvider>
-      <BrowserRouter>
+  <ChakraProvider>
+    <BrowserRouter>
         <React.StrictMode>
-          <App />
-        </React.StrictMode>
-      </BrowserRouter>
-    </ChakraProvider>
-  </Provider>
+          <AuthProvider>       <App /></AuthProvider>
+ 
+      </React.StrictMode>
+    </BrowserRouter>
+  </ChakraProvider>
+</Provider>
 );

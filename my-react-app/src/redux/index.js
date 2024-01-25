@@ -1,10 +1,15 @@
 import { configureStore } from '@reduxjs/toolkit';
-import authUserReducer from './authUser/reducer';
+import booksReducer from './books/reducer';
+import categoriesReducer from './categoryBooks/reducer';
+import usersReducer from './users/reducer';
 
 
 const store = configureStore({
     reducer: {
-        authUser:authUserReducer
+        users: usersReducer,
+        book: booksReducer,
+        category: categoriesReducer
+
     }
 })
 export default store;

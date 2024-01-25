@@ -19,7 +19,7 @@ import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutli
 import { useDispatch } from "react-redux";
 import { asyncDeleteBooks, asyncEditBooks } from "../../redux/books/action";
 
-const ViewDetailBooks = ({ isOpen, onClose, product }) => {
+const ViewDetailBooks = ({ isOpen, onClose, product, isAuthenticated }) => {
   const dispatch = useDispatch();
   const toast = useToast();
 
@@ -31,6 +31,7 @@ const ViewDetailBooks = ({ isOpen, onClose, product }) => {
     thickness: product.thickness,
     image_url: product.image_url,
     price: product.price,
+    category: product.category,
   });
 
   const handleEditbook = async () => {
@@ -121,7 +122,6 @@ const ViewDetailBooks = ({ isOpen, onClose, product }) => {
             maxH="300px"
             objectFit="cover"
           />
-
           <FormControl>
             <FormLabel>Image URL</FormLabel>
             <Input
@@ -131,7 +131,6 @@ const ViewDetailBooks = ({ isOpen, onClose, product }) => {
               placeholder="Enter your image url"
             />
           </FormControl>
-
           <FormControl>
             <FormLabel>Title</FormLabel>
             <Input
@@ -141,7 +140,6 @@ const ViewDetailBooks = ({ isOpen, onClose, product }) => {
               placeholder="Title"
             />
           </FormControl>
-
           <FormControl>
             <FormLabel>Price</FormLabel>
             <Input
@@ -151,7 +149,6 @@ const ViewDetailBooks = ({ isOpen, onClose, product }) => {
               placeholder="Price"
             />
           </FormControl>
-
           <FormControl>
             <FormLabel>Description</FormLabel>
             <Input
@@ -161,7 +158,6 @@ const ViewDetailBooks = ({ isOpen, onClose, product }) => {
               placeholder="Description"
             />
           </FormControl>
-
           <FormControl>
             <FormLabel>Release Year</FormLabel>
             <Input
@@ -171,7 +167,6 @@ const ViewDetailBooks = ({ isOpen, onClose, product }) => {
               placeholder="Release Year"
             />
           </FormControl>
-
           <FormControl>
             <FormLabel>Total Pages</FormLabel>
             <Input
@@ -189,24 +184,36 @@ const ViewDetailBooks = ({ isOpen, onClose, product }) => {
               onChange={handleInputChange}
               placeholder="Thickness"
             />
+          </FormControl>{" "}
+          <FormControl>
+            <FormLabel>Category</FormLabel>
+            <Input
+              value={editedBook?.category?.name}
+              onChange={handleInputChange}
+              placeholder="catgory"
+            />
           </FormControl>
         </ModalBody>
         <ModalFooter justifyContent="center">
-          <Button
-            onClick={handleEditbook}
-            colorScheme="blue"
-            leftIcon={<DriveFileRenameOutlineIcon />}
-          >
-            Edit Book
-          </Button>
-          <Button
-            onClick={handleDeletedbook}
-            colorScheme="red"
-            leftIcon={<DeleteIcon />}
-            ml={4}
-          >
-            Delete
-          </Button>
+          {isAuthenticated && (
+            <>
+              <Button
+                onClick={handleEditbook}
+                colorScheme="blue"
+                leftIcon={<DriveFileRenameOutlineIcon />}
+              >
+                Edit Book
+              </Button>
+              <Button
+                onClick={handleDeletedbook}
+                colorScheme="red"
+                leftIcon={<DeleteIcon />}
+                ml={4}
+              >
+                Delete
+              </Button>
+            </>
+          )}
         </ModalFooter>
       </ModalContent>
     </Modal>
