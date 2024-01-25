@@ -1,4 +1,4 @@
-import * as React from "react";
+import React from "react";
 import Avatar from "@mui/material/Avatar";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
@@ -12,24 +12,70 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { asyncRegisterUser } from "../../redux/authUser/action";
 import { useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { asyncRegisterUser } from "../../redux/authUser/action";
 
 const defaultTheme = createTheme();
 
-export default function Register() {
+const Register = () => {
   const dispatch = useDispatch();
   const toast = useToast();
   const nav = useNavigate();
 
   const [imagePreview, setImagePreview] = useState(null);
-  const [newUser, setNewUser] = useState({
-    username: "",
-    fullname: "",
-    email: "",
-    password: "",
-    image: null,
+
+  const validationSchema = Yup.object({
+    username: Yup.string().required("Username is required"),
+    fullname: Yup.string().required("Fullname is required"),
+    email: Yup.string()
+      .email("Invalid email address")
+      .required("Email is required"),
+    password: Yup.string().required("Password is required"),
+    image: Yup.mixed().required("Profile image is required"),
+  });
+
+  const formik = useFormik({
+    initialValues: {
+      username: "",
+      fullname: "",
+      email: "",
+      password: "",
+      image: null,
+    },
+    validationSchema: validationSchema,
+    onSubmit: async (values) => {
+      try {
+        const formData = new FormData();
+        formData.append("username", values.username);
+        formData.append("fullname", values.fullname);
+        formData.append("email", values.email);
+        formData.append("password", values.password);
+        formData.append("image", values.image);
+
+        await dispatch(asyncRegisterUser(formData));
+        nav("/login");
+        toast({
+          title: "Register Successful",
+          description: "You have successfully registered.",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+          position: "top",
+        });
+      } catch (error) {
+        toast({
+          title: "Register Failed",
+          description: error?.response?.data?.message || error?.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+          position: "top",
+        });
+      }
+    },
   });
 
   const handleImageChange = (event) => {
@@ -37,52 +83,10 @@ export default function Register() {
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setNewUser((prevUser) => ({
-        ...prevUser,
-        image: file,
-      }));
+      formik.setFieldValue("image", file);
       setImagePreview(reader.result);
     };
     reader.readAsDataURL(file);
-  };
-
-  const handleChange = (event) => {
-    const { name, value } = event.target;
-    setNewUser((prevUser) => ({
-      ...prevUser,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (event) => {
-    try {
-      event.preventDefault();
-      const formData = new FormData();
-      formData.append("username", newUser.username);
-      formData.append("fullname", newUser.fullname);
-      formData.append("email", newUser.email);
-      formData.append("password", newUser.password);
-      formData.append("image", newUser.image);
-      await dispatch(asyncRegisterUser(formData));
-      nav("/login");
-      toast({
-        title: "Register Successful",
-        description: "You have successfully register .",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-        position: "top",
-      });
-    } catch (error) {
-      toast({
-        title: "Register Failed",
-        description: error?.response?.data?.message || error?.message,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-        position: "top",
-      });
-    }
   };
 
   return (
@@ -106,7 +110,7 @@ export default function Register() {
           <Box
             component="form"
             noValidate
-            onSubmit={handleSubmit}
+            onSubmit={formik.handleSubmit}
             sx={{ mt: 3 }}
           >
             <Grid container spacing={2}>
@@ -118,8 +122,12 @@ export default function Register() {
                   fullWidth
                   label="Username"
                   autoFocus
-                  value={newUser.username}
-                  onChange={handleChange}
+                  value={formik.values.username}
+                  onChange={formik.handleChange}
+                  error={
+                    formik.touched.username && Boolean(formik.errors.username)
+                  }
+                  helperText={formik.touched.username && formik.errors.username}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -129,8 +137,12 @@ export default function Register() {
                   label="Fullname"
                   name="fullname"
                   autoComplete="family-name"
-                  value={newUser.fullname}
-                  onChange={handleChange}
+                  value={formik.values.fullname}
+                  onChange={formik.handleChange}
+                  error={
+                    formik.touched.fullname && Boolean(formik.errors.fullname)
+                  }
+                  helperText={formik.touched.fullname && formik.errors.fullname}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -141,8 +153,10 @@ export default function Register() {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
-                  value={newUser.email}
-                  onChange={handleChange}
+                  value={formik.values.email}
+                  onChange={formik.handleChange}
+                  error={formik.touched.email && Boolean(formik.errors.email)}
+                  helperText={formik.touched.email && formik.errors.email}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -153,8 +167,12 @@ export default function Register() {
                   label="Password"
                   type="password"
                   autoComplete="new-password"
-                  value={newUser.password}
-                  onChange={handleChange}
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  error={
+                    formik.touched.password && Boolean(formik.errors.password)
+                  }
+                  helperText={formik.touched.password && formik.errors.password}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -205,7 +223,6 @@ export default function Register() {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-              onClick={handleSubmit}
             >
               Sign Up
             </Button>
@@ -221,4 +238,6 @@ export default function Register() {
       </Container>
     </ThemeProvider>
   );
-}
+};
+
+export default Register;
