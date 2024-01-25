@@ -1,35 +1,63 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { TextField } from "@mui/material";
 import useCustomSearchParams from "../../hooks/useCustomSearchParams";
 import { useDispatch } from "react-redux";
 import { asyncReceiveBooks } from "../../redux/books/action";
+import debounce from "lodash/debounce";
 
 const SearchInput = () => {
   const dispatch = useDispatch();
   const [searchParams, updateQueryParams] = useCustomSearchParams();
+  const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => {
-    const handleSearch = () => {
+  const debouncedDispatch = debounce(
+    (
+      name,
+      sortBy,
+      orderBy,
+      maxYear,
+      minYear,
+      maxPage,
+      minPage,
+      category_Id
+    ) => {
       dispatch(
         asyncReceiveBooks(
-          searchParams?.get("name"),
-          searchParams?.get("sortBy"),
-          searchParams?.get("orderBy"),
-          searchParams?.get("maxYear"),
-          searchParams?.get("minYear"),
-          searchParams?.get("maxPage"),
-          searchParams?.get("minPage"),
-          searchParams?.get("category_Id")
+          name,
+          sortBy,
+          orderBy,
+          maxYear,
+          minYear,
+          maxPage,
+          minPage,
+          category_Id
         )
       );
-    };
+    },
+    2000
+  );
 
-    // Debounce the search function
-    const timerId = setTimeout(handleSearch, 300);
+  useEffect(() => {
+    debouncedDispatch(
+      searchParams?.get("name"),
+      searchParams?.get("sortBy"),
+      searchParams?.get("orderBy"),
+      searchParams?.get("maxYear"),
+      searchParams?.get("minYear"),
+      searchParams?.get("maxPage"),
+      searchParams?.get("minPage"),
+      searchParams?.get("category_Id")
+    );
 
-    return () => clearTimeout(timerId);
+    return () => debouncedDispatch.cancel();
   }, [searchParams]);
+
+  useEffect(() => {
+    debouncedDispatch(searchTerm);
+
+    return () => debouncedDispatch.cancel();
+  }, [searchTerm]);
 
   return (
     <>
@@ -38,10 +66,10 @@ const SearchInput = () => {
         size="small"
         label="Search Categories 🔍"
         variant="outlined"
-        value={searchParams.get("name") || ""}
-        onChange={({ target }) => updateQueryParams({ name: target.value })}
+        value={searchTerm}
+        onChange={({ target }) => setSearchTerm(target.value)}
         sx={{ width: { md: "70%" } }}
-      />{" "}
+      />
     </>
   );
 };
