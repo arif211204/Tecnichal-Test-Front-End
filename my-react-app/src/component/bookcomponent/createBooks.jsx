@@ -55,7 +55,7 @@ const CreateBookModal = ({ open, onClose }) => {
       });
       onClose();
 
-      //   window.location.reload();
+      window.location.reload();
     } catch (error) {
       toast({
         title: "Create Book Failed",
